@@ -85,10 +85,11 @@ Put the binary + data in a playground and create the writable game-state files:
 ```
 mkdir -p /mnt/data/nethack/save
 cp nethack nhdat symbols license sysconf /mnt/data/nethack/
-: > record ; : > logfile      # high scores + log
+# NetHack opens these in APPEND mode but won't CREATE them — they must pre-exist:
+for f in record logfile xlogfile livelog paniclog; do : > /mnt/data/nethack/$f; done
 chmod 0777 /mnt/data/nethack /mnt/data/nethack/save
 chmod 0644 /mnt/data/nethack/{nhdat,symbols,license,sysconf}
-chmod 0666 /mnt/data/nethack/{record,logfile}
+chmod 0666 /mnt/data/nethack/{record,logfile,xlogfile,livelog,paniclog}
 ```
 The binary has its build-time `HACKDIR`/`SYSCF_FILE` path compiled in. Rather than match it, just
 symlink it at the real playground:
