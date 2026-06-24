@@ -1,6 +1,18 @@
-> **OpenWrt big-endian MIPS port** (branch `openwrt-mips-yun`): NetHack 3.6.7 cross-compiled
-> for OpenWrt on MIPS (Arduino Yún & friends). See [OPENWRT-MIPS.md](OPENWRT-MIPS.md).
-> Prebuilt binary + `nhdat` are on the release.
+> ## Unofficial fork — OpenWrt big-endian MIPS port
+>
+> **This is NOT the official NetHack repository.** It is an unofficial fork of
+> [NetHack/NetHack](https://github.com/NetHack/NetHack) that adds an OpenWrt big-endian MIPS
+> (Arduino Yún & friends) cross-compile of **NetHack 3.6.7**, on branch `openwrt-mips-yun`.
+>
+> For the real game — downloads, support, bug reports, and the authoritative source — go to the
+> official project: **[nethack.org](https://www.nethack.org/)** and
+> **[github.com/NetHack/NetHack](https://github.com/NetHack/NetHack)**.
+>
+> Port additions only: [`OPENWRT-MIPS.md`](OPENWRT-MIPS.md), `sys/unix/openwrt-mips/`, and a small
+> arrow-key patch in `src/cmd.c`. Prebuilt binary + `nhdat` are on the GitHub release. Everything
+> below this line is the upstream NetHack 3.6.7 README, unchanged.
+>
+> ---
 
          NetHack 3.6.7 -- General information February 2023
 
