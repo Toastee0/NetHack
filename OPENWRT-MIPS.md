@@ -107,6 +107,17 @@ A captive game account (everyone SSHes in as `hack` and lands straight in the ga
 `sys/unix/openwrt-mips/play.sh`. Set the user's login shell to it, and harden `sysconf`
 (`SHELLERS=root`) + `SHELL=/bin/false` so the `!` shell-escape can't pop a shell.
 
+## Arrow-key movement (port patch)
+
+Stock NetHack 3.6 unix tty has **no arrow-key support** — movement is `hjkl`, and there's no
+`.nethackrc`/sysconf option to change it (arrow keys only ever existed on the DOS/OS2/ST *BIOS*
+ports). This branch adds a small patch in `src/cmd.c::readchar()` that translates ANSI/VT
+cursor-key sequences (`ESC [ A..D` and `ESC O A..D`, covering both keypad modes) into `hjkl`,
+with a `select()` timeout so a lone `ESC` still cancels. It touches no struct, so it has **no
+effect on the version stamp** — rebuild only `cmd.o` and relink; data/`nhdat` are unaffected.
+(Always-on; if you'd rather gate it behind an option, do it via `iflags` reading from sysconf,
+*not* a new `struct flag` field — that would change `VERSION_SANITY` and break data compatibility.)
+
 ## Gotchas cheat-sheet
 
 - **Endianness + word size of the version stamp** — the whole point (see TL;DR). Generate data &

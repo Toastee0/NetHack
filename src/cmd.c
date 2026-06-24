@@ -5898,6 +5898,50 @@ end_of_input()
 }
 #endif /* HANGUPHANDLING */
 
+#ifdef UNIX
+#include <sys/select.h>
+#include <sys/time.h>
+/* Translate ANSI/VT cursor-key escape sequences into hjkl movement.
+ * Arrow keys send "ESC [ A".."D" (normal keypad) or "ESC O A".."D"
+ * (application keypad, which NetHack turns on via terminfo) -- handle both.
+ * A short select() timeout lets a lone ESC still work as cancel. */
+STATIC_OVL int
+tty_arrow_key()
+{
+    fd_set rfds;
+    struct timeval tv;
+    int c2, c3;
+
+    FD_ZERO(&rfds);
+    FD_SET(0, &rfds);
+    tv.tv_sec = 0;
+    tv.tv_usec = 50000L; /* 50ms; arrow sequences arrive as one burst */
+    if (select(1, &rfds, (fd_set *) 0, (fd_set *) 0, &tv) <= 0)
+        return 0; /* lone ESC */
+    c2 = pgetchar();
+    if (c2 != '[' && c2 != 'O')
+        return 0;
+    FD_ZERO(&rfds);
+    FD_SET(0, &rfds);
+    tv.tv_sec = 0;
+    tv.tv_usec = 50000L;
+    if (select(1, &rfds, (fd_set *) 0, (fd_set *) 0, &tv) <= 0)
+        return 0;
+    c3 = pgetchar();
+    switch (c3) {
+    case 'A':
+        return 'k'; /* up */
+    case 'B':
+        return 'j'; /* down */
+    case 'C':
+        return 'l'; /* right */
+    case 'D':
+        return 'h'; /* left */
+    }
+    return 0;
+}
+#endif /* UNIX */
+
 char
 readchar()
 {
@@ -5945,6 +5989,15 @@ readchar()
         readchar_queue = click_to_cmd(x, y, mod);
         sym = *readchar_queue++;
     }
+#ifdef UNIX
+    /* arrow keys -> hjkl movement (unix tty has no native arrow support) */
+    if (sym == '\033' && !in_doagain && !*readchar_queue) {
+        int ak = tty_arrow_key();
+
+        if (ak)
+            sym = ak;
+    }
+#endif
     return (char) sym;
 }
 
